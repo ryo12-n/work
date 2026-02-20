@@ -1,228 +1,8 @@
 # CLAUDE.md
 
-This file provides guidance for AI assistants working in this repository.
+このファイルは、リポジトリで作業する AI アシスタント向けのガイドラインを提供します。
 
-## Project Overview
-
-This is a Go project in early initialization. Currently the repository contains only foundational scaffolding (`.gitignore`, `README.md`). No source code, modules, tests, or build infrastructure have been implemented yet.
-
-**Language**: Go
-**Repository**: `ryo12-n/work`
-**Branch model**: feature branches off `master`/`main`
-
----
-
-## Repository Structure
-
-```
-/
-├── .gitignore       # Go-specific ignore rules
-├── README.md        # Project title placeholder
-└── CLAUDE.md        # This file
-```
-
-As the project grows, the expected Go project layout is:
-
-```
-/
-├── cmd/             # Main application entry points (one subdir per binary)
-│   └── <app>/
-│       └── main.go
-├── internal/        # Private application/library code (not importable externally)
-├── pkg/             # Public library code (importable by external projects)
-├── api/             # API definitions (OpenAPI specs, protobuf files, etc.)
-├── configs/         # Configuration file templates
-├── scripts/         # Build and maintenance scripts
-├── docs/            # Project documentation
-├── go.mod           # Go module definition
-├── go.sum           # Dependency checksums
-├── Makefile         # Build targets
-└── CLAUDE.md        # This file
-```
-
----
-
-## Development Setup
-
-### Prerequisites
-
-- Go 1.21+ (`go version` to verify)
-- Git with GPG signing configured (commits in this repo are GPG-signed)
-
-### Initialize the Go module
-
-When creating the module for the first time:
-
-```bash
-go mod init github.com/ryo12-n/work
-```
-
-### Install dependencies
-
-```bash
-go mod tidy
-```
-
-### Build
-
-```bash
-go build ./...
-```
-
-### Run
-
-```bash
-go run ./cmd/<app>/
-```
-
----
-
-## Testing
-
-This project uses the standard Go test toolchain.
-
-### Run all tests
-
-```bash
-go test ./...
-```
-
-### Run tests with coverage
-
-```bash
-go test -coverprofile=coverage.out ./...
-go tool cover -html=coverage.out
-```
-
-### Run a specific test
-
-```bash
-go test -run TestFunctionName ./path/to/package/
-```
-
-### Test conventions
-
-- Test files are named `<file>_test.go` in the same package as the code under test
-- Use `package foo_test` (external test package) for black-box tests
-- Use `package foo` (same package) for white-box tests that need access to unexported symbols
-- Table-driven tests are preferred for comprehensive coverage
-- Subtests (`t.Run(...)`) should be used to group related cases
-
----
-
-## Code Conventions
-
-### General Go style
-
-- Follow [Effective Go](https://go.dev/doc/effective_go) and the [Go Code Review Comments](https://github.com/golang/go/wiki/CodeReviewComments)
-- Use `gofmt` / `goimports` for formatting — never commit unformatted code
-- Run `go vet ./...` before committing
-- Prefer `errors.Is` / `errors.As` over string matching for error checks
-- Return errors; do not use `panic` in library code
-- Keep functions small and focused on a single responsibility
-
-### Naming
-
-- Packages: lowercase single words, no underscores (`httputil`, not `http_util`)
-- Exported identifiers: PascalCase; unexported: camelCase
-- Interfaces: use `-er` suffix when possible (`Reader`, `Writer`, `Stringer`)
-- Avoid stutter: `user.User` should just be `user.T` or restructure the package
-
-### Error handling
-
-- Wrap errors with context: `fmt.Errorf("loading config: %w", err)`
-- Define sentinel errors as package-level vars: `var ErrNotFound = errors.New("not found")`
-- Return `(T, error)` pairs; avoid out-parameters
-
-### Comments
-
-- Every exported symbol must have a doc comment starting with the symbol name
-- Comments are full sentences ending with a period
-- Use `// TODO(username): ...` for tracked work items
-
----
-
-## Git Workflow
-
-### Branch naming
-
-- Feature branches: `feature/<short-description>`
-- Bug fixes: `fix/<short-description>`
-- Claude-generated branches follow: `claude/<description>-<session-id>`
-
-### Commit messages
-
-Use the conventional commit format:
-
-```
-<type>(<scope>): <short summary>
-
-<body — optional, wrap at 72 chars>
-
-<footer — optional, e.g. Closes #123>
-```
-
-Types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `ci`
-
-Example:
-
-```
-feat(api): add user registration endpoint
-
-Implements POST /users with email/password validation.
-Passwords are hashed with bcrypt (cost 12).
-
-Closes #42
-```
-
-### Commit hygiene
-
-- Commits are GPG-signed in this repository; ensure signing is configured
-- Keep commits atomic — one logical change per commit
-- Do not commit `.env` files, test binaries, or build artifacts (covered by `.gitignore`)
-
----
-
-## Linting and Static Analysis
-
-When a linter configuration is added, the recommended tools are:
-
-```bash
-# Format and organize imports
-goimports -w .
-
-# Vet
-go vet ./...
-
-# golangci-lint (aggregates many linters)
-golangci-lint run ./...
-```
-
-A `.golangci.yml` should be added at the root when the project matures.
-
----
-
-## CI/CD
-
-No CI pipeline is configured yet. When added, the pipeline should:
-
-1. Run `go build ./...`
-2. Run `go vet ./...`
-3. Run `go test -race -coverprofile=coverage.out ./...`
-4. Upload coverage report
-5. Run `golangci-lint run ./...`
-
----
-
-## Environment Variables
-
-- Never commit `.env` files (already in `.gitignore`)
-- Document all required environment variables in a `.env.example` file
-- Prefer structured configuration with validation at startup (e.g., via `github.com/caarlos0/env` or `github.com/spf13/viper`)
-
----
-
-## Language Convention
+## 言語規約
 
 **基本的に日本語を使用すること。**
 
@@ -233,29 +13,251 @@ No CI pipeline is configured yet. When added, the pipeline should:
 
 ---
 
-## AI Assistant Guidelines
+## プロジェクト概要
 
-### What to do
+初期化段階の Go プロジェクトです。現在のリポジトリには基本的な足場（`.gitignore`、`README.md`）のみが存在し、ソースコード・モジュール・テスト・ビルドインフラはまだ実装されていません。
 
-- Read existing code before modifying it — never guess at structure
-- Follow Go idioms and the conventions in this file
-- Prefer editing existing files over creating new ones
-- Keep changes minimal and scoped to what was requested
-- Run `go build ./...` and `go vet ./...` after making changes
-- Run `go test ./...` to verify nothing is broken
-- Use `goimports` to format changed files
+**言語**: Go
+**リポジトリ**: `ryo12-n/work`
+**ブランチモデル**: `master`/`main` からのフィーチャーブランチ
 
-### What to avoid
+---
 
-- Do not commit vendored dependencies without explicit instruction
-- Do not add dependencies without justification — evaluate stdlib alternatives first
-- Do not add global state or `init()` functions without a clear reason
-- Do not use `interface{}` / `any` when a concrete type is known
-- Do not suppress errors with `_`
-- Do not add `TODO` comments without an owner/issue reference
+## リポジトリ構成
 
-### When uncertain
+現在の構成：
 
-- Ask before introducing a new dependency
-- Ask before restructuring packages or changing public APIs
-- Prefer conservative, minimal changes when requirements are ambiguous
+```
+/
+├── .gitignore       # Go 向けの除外ルール
+├── README.md        # プロジェクトタイトルのプレースホルダー
+└── CLAUDE.md        # このファイル
+```
+
+プロジェクトが成長するにつれて期待される標準的な Go プロジェクトレイアウト：
+
+```
+/
+├── cmd/             # メインアプリケーションのエントリーポイント（バイナリごとにサブディレクトリ）
+│   └── <app>/
+│       └── main.go
+├── internal/        # 非公開のアプリケーション/ライブラリコード（外部からインポート不可）
+├── pkg/             # 公開ライブラリコード（外部プロジェクトからインポート可）
+├── api/             # API 定義（OpenAPI スペック、protobuf ファイルなど）
+├── configs/         # 設定ファイルのテンプレート
+├── scripts/         # ビルド・メンテナンス用スクリプト
+├── docs/            # プロジェクトドキュメント
+├── go.mod           # Go モジュール定義
+├── go.sum           # 依存関係チェックサム
+├── Makefile         # ビルドターゲット
+└── CLAUDE.md        # このファイル
+```
+
+---
+
+## 開発環境セットアップ
+
+### 前提条件
+
+- Go 1.21 以上（`go version` で確認）
+- GPG 署名が設定された Git（このリポジトリのコミットは GPG 署名済み）
+
+### Go モジュールの初期化
+
+初回のモジュール作成時：
+
+```bash
+go mod init github.com/ryo12-n/work
+```
+
+### 依存関係のインストール
+
+```bash
+go mod tidy
+```
+
+### ビルド
+
+```bash
+go build ./...
+```
+
+### 実行
+
+```bash
+go run ./cmd/<app>/
+```
+
+---
+
+## テスト
+
+このプロジェクトは標準の Go テストツールチェーンを使用します。
+
+### 全テストの実行
+
+```bash
+go test ./...
+```
+
+### カバレッジ付きテストの実行
+
+```bash
+go test -coverprofile=coverage.out ./...
+go tool cover -html=coverage.out
+```
+
+### 特定のテストの実行
+
+```bash
+go test -run TestFunctionName ./path/to/package/
+```
+
+### テスト規約
+
+- テストファイルはテスト対象コードと同じパッケージ内で `<file>_test.go` という名前にする
+- ブラックボックステストには `package foo_test`（外部テストパッケージ）を使用する
+- 非公開シンボルへのアクセスが必要なホワイトボックステストには `package foo`（同一パッケージ）を使用する
+- 幅広いカバレッジのためにテーブル駆動テストを推奨する
+- 関連するケースのグループ化にはサブテスト（`t.Run(...)`）を使用する
+
+---
+
+## コーディング規約
+
+### Go の一般的なスタイル
+
+- [Effective Go](https://go.dev/doc/effective_go) および [Go Code Review Comments](https://github.com/golang/go/wiki/CodeReviewComments) に従う
+- フォーマットには `gofmt` / `goimports` を使用する — フォーマットされていないコードはコミットしない
+- コミット前に `go vet ./...` を実行する
+- エラーチェックには文字列マッチングではなく `errors.Is` / `errors.As` を優先する
+- エラーは返す — ライブラリコードでは `panic` を使用しない
+- 関数は小さく、単一の責務に集中させる
+
+### 命名規則
+
+- パッケージ名：アンダースコアなしの小文字単語（`http_util` ではなく `httputil`）
+- 公開識別子：PascalCase、非公開識別子：camelCase
+- インターフェース：可能な場合は `-er` サフィックスを使用（`Reader`、`Writer`、`Stringer`）
+- 重複を避ける：`user.User` は `user.T` にするかパッケージを再構成する
+
+### エラーハンドリング
+
+- コンテキストを付けてエラーをラップする：`fmt.Errorf("設定の読み込み: %w", err)`
+- センチネルエラーはパッケージレベルの変数として定義する：`var ErrNotFound = errors.New("not found")`
+- `(T, error)` のペアを返す — 出力パラメータは避ける
+
+### コメント
+
+- 公開シンボルにはすべて、シンボル名から始まる doc コメントを付ける
+- コメントは句点で終わる完全な文にする
+- 追跡が必要な作業項目には `// TODO(username): ...` を使用する
+
+---
+
+## Git ワークフロー
+
+### ブランチ命名規則
+
+- フィーチャーブランチ：`feature/<短い説明>`
+- バグ修正：`fix/<短い説明>`
+- Claude が生成するブランチ：`claude/<説明>-<セッションID>`
+
+### コミットメッセージ
+
+conventional commit 形式を使用する：
+
+```
+<type>(<scope>): <短い要約>
+
+<本文 — 任意、72文字で折り返す>
+
+<フッター — 任意、例: Closes #123>
+```
+
+タイプ：`feat`、`fix`、`docs`、`refactor`、`test`、`chore`、`ci`
+
+例：
+
+```
+feat(api): ユーザー登録エンドポイントを追加
+
+メールアドレス/パスワードのバリデーション付きで POST /users を実装。
+パスワードは bcrypt（コスト12）でハッシュ化。
+
+Closes #42
+```
+
+### コミット衛生
+
+- このリポジトリのコミットは GPG 署名済み — 署名の設定を確認すること
+- コミットはアトミックに保つ — 1コミットにつき1つの論理的変更
+- `.env` ファイル、テストバイナリ、ビルド成果物はコミットしない（`.gitignore` でカバー済み）
+
+---
+
+## リンティングと静的解析
+
+リンター設定が追加された際に推奨するツール：
+
+```bash
+# フォーマットとインポートの整理
+goimports -w .
+
+# Vet
+go vet ./...
+
+# golangci-lint（多数のリンターを集約）
+golangci-lint run ./...
+```
+
+プロジェクトが成熟したら、ルートに `.golangci.yml` を追加すること。
+
+---
+
+## CI/CD
+
+現時点では CI パイプラインは設定されていません。追加する際、パイプラインは以下を実行すること：
+
+1. `go build ./...` の実行
+2. `go vet ./...` の実行
+3. `go test -race -coverprofile=coverage.out ./...` の実行
+4. カバレッジレポートのアップロード
+5. `golangci-lint run ./...` の実行
+
+---
+
+## 環境変数
+
+- `.env` ファイルは絶対にコミットしない（`.gitignore` でカバー済み）
+- 必要な環境変数はすべて `.env.example` ファイルに記載する
+- 起動時にバリデーション付きの構造化設定を優先する（例：`github.com/caarlos0/env` や `github.com/spf13/viper`）
+
+---
+
+## AI アシスタント向けガイドライン
+
+### すべきこと
+
+- コードを修正する前に既存コードを読む — 構造を推測しない
+- Go のイディオムとこのファイルの規約に従う
+- 新しいファイルを作るより既存ファイルを編集することを優先する
+- 変更は最小限に、依頼された内容にスコープを絞る
+- 変更後は `go build ./...` と `go vet ./...` を実行する
+- `go test ./...` を実行して何も壊れていないことを確認する
+- 変更したファイルには `goimports` でフォーマットをかける
+
+### すべきでないこと
+
+- 明示的な指示なしにベンダー化された依存関係をコミットしない
+- 正当な理由なく依存関係を追加しない — まず標準ライブラリの代替を検討する
+- 明確な理由なくグローバル状態や `init()` 関数を追加しない
+- 具体的な型が分かっている場合に `interface{}` / `any` を使用しない
+- `_` でエラーを握り潰さない
+- 担当者/Issue 参照なしに `TODO` コメントを追加しない
+
+### 不明な場合
+
+- 新しい依存関係を導入する前に確認する
+- パッケージの再構成や公開 API の変更前に確認する
+- 要件が曖昧な場合は保守的で最小限の変更を優先する
