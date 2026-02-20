@@ -222,6 +222,17 @@ No CI pipeline is configured yet. When added, the pipeline should:
 
 ---
 
+## Language Convention
+
+**基本的に日本語を使用すること。**
+
+- コードコメント、ドキュメント、コミットメッセージの本文、Issue/PR の説明はすべて日本語で記述する
+- コード内の識別子（変数名・関数名・型名など）は Go の慣習に従い英語のまま維持する
+- Go の公式 doc comment（`godoc` で生成されるもの）は英語でも構わないが、補足説明は日本語を優先する
+- AI アシスタントとのやり取りも日本語で行う
+
+---
+
 ## AI Assistant Guidelines
 
 ### What to do
