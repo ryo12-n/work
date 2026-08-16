@@ -75,12 +75,7 @@ bash scripts/test-lib.sh && bash scripts/test-deploy.sh && bash scripts/test-che
 
 `docs/bootstrap.md` を参照。
 
-## 畳む条件
+## 古くなった記述の扱い
 
-以下のどちらかを満たしたら、この仕組み全体を畳む。
-
-- `harness-drift-check` が **30日連続で異常なしを報告し、かつその間デプロイが1回も無い**
-- **複数マシンでのブートストラップ（`docs/bootstrap.md`）が 2027-02-17 までに一度も使われていない**
-
-畳むとは、`harness/` `scripts/` `docs/bootstrap.md` を削除し、`~/.claude` を元の状態
-（このリポジトリが取り込む前の、配布物ではない単体のディレクトリ）に戻すことを指す。
+**古い記述は、見つけたタイミングで削除して最新に置き換える。**
+そのために事前の畳む条件・検知器・カウンタは設けない（`harness/rules/メモリ管理規約.md` 8節）。
