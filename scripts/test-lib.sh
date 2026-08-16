@@ -48,5 +48,22 @@ assert_eq "$(harness_source_files | tr '\n' ',')" \
 assert_eq "$(harness_target_managed_files | tr '\n' ',')" "rules/古いルール.md," \
           "配布先の列挙は所有ディレクトリ内のみ（.credentials.json と sessions/ を含まない）"
 
+# --- harness_plan ---
+# 配布先に settings.json は無い → ADD
+# rules/メモリ管理規約.md も無い → ADD
+# rules/古いルール.md は原本に無い → DELETE
+assert_eq "$(harness_plan | tr '\t' ':' | tr '\n' ',')" \
+          "ADD:rules/メモリ管理規約.md,ADD:scheduled-tasks/foo/SKILL.md,ADD:settings.json,DELETE:rules/古いルール.md," \
+          "初回は全て ADD、原本に無い所有ファイルは DELETE"
+
+# 同一内容を置いたら SAME、変えたら UPDATE
+mkdir -p "$TMP/dst/scheduled-tasks/foo"
+cp "$TMP/src/settings.json" "$TMP/dst/settings.json"
+printf 'DIFFERENT\n' > "$TMP/dst/rules/メモリ管理規約.md"
+assert_eq "$(harness_plan | grep -c '^SAME')"   "1" "内容が同じファイルは SAME"
+assert_eq "$(harness_plan | grep -c '^UPDATE')" "1" "内容が違うファイルは UPDATE"
+rm -f "$TMP/dst/settings.json" "$TMP/dst/rules/メモリ管理規約.md"
+rmdir "$TMP/dst/scheduled-tasks/foo" "$TMP/dst/scheduled-tasks"
+
 printf '\n%d passed, %d failed\n' "$PASS" "$FAIL"
 [ "$FAIL" -eq 0 ]

@@ -51,3 +51,31 @@ harness_target_managed_files() {
     ( cd "$HARNESS_TARGET" && find "$d" -type f -printf '%p\n' )
   done < <(harness_owned_dirs) | harness_filter_excluded | LC_ALL=C sort
 }
+
+# 配布計画を "<動作>\t<相対パス>" で出す。
+# ADD/UPDATE/SAME は原本側、DELETE は所有ディレクトリ内の余剰ファイル。
+harness_plan() {
+  local p src_hash dst_hash
+  declare -A in_src=()
+
+  while IFS= read -r p; do
+    [ -n "$p" ] || continue
+    in_src["$p"]=1
+    if [ ! -f "$HARNESS_TARGET/$p" ]; then
+      printf 'ADD\t%s\n' "$p"
+    else
+      src_hash="$(harness_sha "$HARNESS_SOURCE/$p")"
+      dst_hash="$(harness_sha "$HARNESS_TARGET/$p")"
+      if [ "$src_hash" = "$dst_hash" ]; then
+        printf 'SAME\t%s\n' "$p"
+      else
+        printf 'UPDATE\t%s\n' "$p"
+      fi
+    fi
+  done < <(harness_source_files)
+
+  while IFS= read -r p; do
+    [ -n "$p" ] || continue
+    [ -n "${in_src[$p]+x}" ] || printf 'DELETE\t%s\n' "$p"
+  done < <(harness_target_managed_files)
+}
