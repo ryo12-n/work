@@ -5,14 +5,18 @@ description: メモリ管理規約への違反を毎日点検し、サブエー�
 
 メモリが規約に沿って保たれているかを点検し、**人の承認を待たずに是正する。**
 
+**点検対象はリポジトリの原本（`C:\Users\nr202\projects\work\harness\`）である。**
+`~/.claude` は配布物であり、直接直しても次のデプロイで巻き戻る。
+直したら `bash "C:/Users/nr202/projects/work/scripts/deploy.sh" --yes` まで実行すること。
+
 **このファイルに判定基準を書かない。** ここは駆動だけを持つ。
 
 ## 手順
 
 1. **基準を読む。この2本が正。**
 
-   - `C:\Users\nr202\.claude\rules\メモリ管理規約.md` — 本文1〜11条。**何が正しいか**
-   - `C:\Users\nr202\.claude\scheduled-tasks\memory-health-check\reference\点検項目.md` —
+   - `C:\Users\nr202\projects\work\harness\rules\メモリ管理規約.md` — 本文1〜11条。**何が正しいか**
+   - `C:\Users\nr202\projects\work\harness\scheduled-tasks\memory-health-check\reference\点検項目.md` —
      0〜7節。**何を検査し、どこまで自律で直すか**
 
    前者はユーザースコープで自動ロードされているが、**必ず読み直す。**本人が編集している。
@@ -36,7 +40,7 @@ description: メモリ管理規約への違反を毎日点検し、サブエー�
 5. **B表のうち「自律」の項目は、修復案を作りサブエージェントのレビューに掛ける。**
    依頼のしかたは点検項目5節に従う。要点：
 
-   - レビュアの指定は `C:\Users\nr202\iCloudDrive\iCloud~md~obsidian\CLAUDE.md` の規定に従う
+   - レビュアの指定は `C:\Users\nr202\projects\work\harness\CLAUDE.md` の規定に従う
    - **渡すのは unified diff と規約の該当条項だけ。「なぜ直すか」を渡さない**
    - 問いは「**この修復で失われる情報は何か**」
    - 出力形式は **判定 / 失われる情報 / 復元手順**

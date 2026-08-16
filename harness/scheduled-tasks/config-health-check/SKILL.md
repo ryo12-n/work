@@ -5,6 +5,10 @@ description: Claude Code の設定・スキル・ルールが公式のベスト�
 
 Claude Code の設定・スケジュール済みタスク・ルールファイルが、公式ドキュメントのベストプラクティスに沿って保たれているかを点検する。
 
+**点検対象はリポジトリの原本（`C:\Users\nr202\projects\work\harness\`）である。**
+`~/.claude` は配布物であり、直接直しても次のデプロイで巻き戻る。
+直したら `bash "C:/Users/nr202/projects/work/scripts/deploy.sh" --yes` まで実行すること。
+
 **この点検は毎日走るが、対象はほとんど変化しない。差分ゲートを最初に通し、変化がなければ即終了すること。**
 毎日フル点検すると必ず空洞化する（この保管庫の持ち主には「新しい生活習慣は空洞化して停止する」という
 自己傾向が記録されている）。
@@ -18,7 +22,7 @@ Claude Code の設定・スケジュール済みタスク・ルールファイ�
 対象ファイルの現在の mtime を取る。
 
 ```bash
-cd "C:/Users/nr202/iCloudDrive/iCloud~md~obsidian" && stat -c '%Y %n' "C:/Users/nr202/.claude/settings.json" "C:/Users/nr202/.claude/rules/"*.md "C:/Users/nr202/.claude/scheduled-tasks/"*/SKILL.md CLAUDE.md "personal/AIメモリ/MEMORY.md" $(grep -oP '\]\(\K[^)]+' "personal/AIメモリ/MEMORY.md") 2>/dev/null
+cd "C:/Users/nr202/iCloudDrive/iCloud~md~obsidian" && stat -c '%Y %n' "C:/Users/nr202/projects/work/harness/settings.json" "C:/Users/nr202/projects/work/harness/rules/"*.md "C:/Users/nr202/projects/work/harness/scheduled-tasks/"*/SKILL.md "C:/Users/nr202/projects/work/harness/CLAUDE.md" "personal/AIメモリ/MEMORY.md" $(grep -oP '\]\(\K[^)]+' "personal/AIメモリ/MEMORY.md") 2>/dev/null
 ```
 
 **保管庫側の対象は索引（MEMORY.md）から動的に取る。**保管庫は再編の途中で、
@@ -56,13 +60,13 @@ cd "C:/Users/nr202/iCloudDrive/iCloud~md~obsidian" && stat -c '%Y %n' "C:/Users/
 - 相対日付（「先週」「今月」「最近」）が残っていないか。絶対日付に直す
 - 記述が矛盾していないか。両論併記になっていないか（この保管庫の既定は上書き更新）
 
-### `C:\Users\nr202\.claude\settings.json`
+### `C:\Users\nr202\projects\work\harness\settings.json`
 - JSON として妥当か
 - `$schema` に `https://json.schemastore.org/claude-code-settings.json` が入っているか
 - `permissions` の `allow`/`deny` に、実在しないコマンドやツール名の指定が無いか
 - `enabledPlugins` に挙がっているプラグインが実際に使われているか
 
-### `C:\Users\nr202\.claude\scheduled-tasks\*\SKILL.md`
+### `C:\Users\nr202\projects\work\harness\scheduled-tasks\*\SKILL.md`
 - frontmatter に `name` と `description` があり、`name` がディレクトリ名と一致しているか
 - `description` が「何をするか」だけでなく**「いつ使うか」**を含んでいるか（公式の推奨形）
 - **タスクが自己完結しているか。**各実行は前回の記憶を持たない。会話の文脈に依存した
@@ -80,13 +84,13 @@ cd "C:/Users/nr202/iCloudDrive/iCloud~md~obsidian" && stat -c '%Y %n' "C:/Users/
 SKILL.md が残ることがある（`memory-health-check` は 2026-08-16 に削除、ファイルは復元用に残置）。
 点検前に `list_scheduled_tasks` で登録済みの taskId を取り、それ以外は無視する。
 
-### `C:\Users\nr202\.claude\rules\*.md`
+### `C:\Users\nr202\projects\work\harness\rules\*.md`
 - 保管庫のルール（索引の「保管庫を触るとき」が指すファイル群）と二重管理になっていないか。
   同じ規約が両方にあれば指摘する
 - そのルールが適用される対象が実在するか
   ※ `memory.md` は現在 `~/.claude/projects/*/memory/` が空で、適用対象がない状態。削除候補（本人判断待ち）
 
-### 保管庫の `CLAUDE.md`
+### ユーザースコープの `CLAUDE.md`
 - **200行以内か。**`@` import があれば展開後の実効行数で数えること（import 先の行数を足す）
 - ドキュメントではなくチートシートになっているか。導出できる説明が残っていないか
 - ファイルパスの直書きが復活していないか（パスは索引が持つ規約）。
