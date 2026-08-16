@@ -16,11 +16,28 @@ done
 printf '原本:   %s\n' "$HARNESS_SOURCE"
 printf '配布先: %s\n\n' "$HARNESS_TARGET"
 
+# 状態ファイルへ「配布先の現状」を記録する。差分の有無に関わらず呼ぶことで、
+# .harness-state が消えたり古いままだったりしても check.sh が正しく復帰できるようにする。
+# --dry-run では絶対に呼ばない（何も書き込まないという契約を守るため）。
+write_harness_state() {
+  {
+    printf '# deployedAt: %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    printf '# commit: %s\n' "$(git -C "$REPO_ROOT" rev-parse HEAD 2>/dev/null || printf 'unknown')"
+    while IFS= read -r p; do
+      [ -n "$p" ] || continue
+      printf '%s  %s\n' "$(harness_sha "$HARNESS_TARGET/$p")" "$p"
+    done < <(harness_source_files)
+  } > "$HARNESS_STATE"
+}
+
 PLAN="$(harness_plan)"
 CHANGES="$(printf '%s\n' "$PLAN" | grep -v '^SAME' || true)"
 
 if [ -z "$CHANGES" ]; then
   printf '差分なし。\n'
+  if [ "$DRY_RUN" -eq 0 ]; then
+    write_harness_state
+  fi
   exit 0
 fi
 
@@ -72,13 +89,6 @@ while IFS=$'\t' read -r action path; do
 done <<< "$CHANGES"
 
 # 4. 状態を記録
-{
-  printf '# deployedAt: %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-  printf '# commit: %s\n' "$(git -C "$REPO_ROOT" rev-parse HEAD 2>/dev/null || printf 'unknown')"
-  while IFS= read -r p; do
-    [ -n "$p" ] || continue
-    printf '%s  %s\n' "$(harness_sha "$HARNESS_TARGET/$p")" "$p"
-  done < <(harness_source_files)
-} > "$HARNESS_STATE"
+write_harness_state
 
 printf '反映しました。バックアップ: %s\n' "$BACKUP_DIR"

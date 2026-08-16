@@ -7,9 +7,19 @@ git clone https://github.com/ryo12-n/work.git
 cd work
 ```
 
-配置先は任意だが、`harness/scheduled-tasks/` の各タスク定義が
-`C:\Users\nr202\projects\work` を絶対パスで参照している。
-別の場所に置く場合は、`harness/scheduled-tasks/` 配下のパスを一括で置き換えること。
+**パスはハードコードされている。ユーザー名やリポジトリの配置場所が変わると壊れる。**
+移植可能にはしていない — 以下がそのまま書き換えを必要とする箇所。
+
+- `harness/scheduled-tasks/` 配下の各 `SKILL.md` は全て
+  `C:\Users\nr202\projects\work\harness\...` を絶対パスで参照している
+- `harness/rules/` 配下の各ファイルも同様に `C:\Users\nr202\projects\work\harness\...` を参照している
+- `harness/scheduled-tasks/link-integrity-check/linkcheck.sh` と
+  `harness/scheduled-tasks/config-health-check/fix-index.sh` は
+  Obsidian の保管庫パス `/c/Users/nr202/iCloudDrive/iCloud~md~obsidian/...` を直書きしている
+
+ユーザー名が `nr202` と異なる場合、このリポジトリを `C:\Users\nr202\projects\work` 以外に置く場合、
+または保管庫の場所が異なる場合は、上記のファイル群を手動で一括置換すること。
+自動化・変数化は行っていない。
 
 ## 2. 配布する
 

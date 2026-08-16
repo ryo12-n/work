@@ -12,6 +12,13 @@ assert_absent()  { if [ ! -e "$1" ]; then ok "$2"; else ng "$2 (在る: $1)"; fi
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
+# パスだけでなく内容も見る manifest。in-place の中身書き換えを見逃さないため、
+# ハッシュ一覧（ファイル）とパス一覧（空ディレクトリの増減も拾う）の両方を比較材料にする。
+manifest() {
+  ( cd "$1" && find . -type f -exec sha256sum {} + 2>/dev/null | LC_ALL=C sort
+    cd "$1" && find . | LC_ALL=C sort )
+}
+
 setup() {
   rm -rf "$TMP/src" "$TMP/dst"
   mkdir -p "$TMP/src/rules" "$TMP/src/scheduled-tasks/foo" "$TMP/src/skills"
@@ -35,13 +42,24 @@ run_deploy() {
 
 # --- 1. --dry-run は一切書き込まない ---
 setup
-before="$(cd "$TMP/dst" && find . | LC_ALL=C sort)"
+before="$(manifest "$TMP/dst")"
 HARNESS_SOURCE="$TMP/src" HARNESS_TARGET="$TMP/dst" \
   bash "$SCRIPT_DIR/deploy.sh" --dry-run >/dev/null 2>&1
 dry_rc=$?
-after="$(cd "$TMP/dst" && find . | LC_ALL=C sort)"
+after="$(manifest "$TMP/dst")"
 assert_eq "$after" "$before" "--dry-run が配布先を変更しない"
 assert_eq "$dry_rc" "1" "--dry-run は差分ありで終了コード1"
+
+# --- 1b. 差分が無い状態での --dry-run も一切書き込まない ---
+setup
+run_deploy --yes
+before="$(manifest "$TMP/dst")"
+HARNESS_SOURCE="$TMP/src" HARNESS_TARGET="$TMP/dst" \
+  bash "$SCRIPT_DIR/deploy.sh" --dry-run >/dev/null 2>&1
+dry_rc2=$?
+after="$(manifest "$TMP/dst")"
+assert_eq "$after" "$before" "差分なしの --dry-run も配布先を変更しない（状態ファイルの再生成を含めて書かない）"
+assert_eq "$dry_rc2" "0" "差分なしの --dry-run は終了コード0"
 
 # --- 2. 初回デプロイ ---
 setup
@@ -75,6 +93,23 @@ run_deploy --yes
 rc=$?
 assert_eq "$rc" "0" "差分が無い状態で再実行しても成功する"
 assert_eq "$(cat "$TMP/dst/settings.json")" "A2" "再実行で内容が変わらない"
+
+# --- 6. 差分が無くても状態ファイルは書かれる（消えていたら復元される） ---
+setup
+run_deploy --yes
+rm -f "$TMP/dst/.harness-state"
+run_deploy --yes
+rc6=$?
+assert_eq "$rc6" "0" "差分なしの実デプロイも成功する"
+assert_file "$TMP/dst/.harness-state" "差分が無くても状態ファイルが再作成される"
+
+# --- 7. 配布先の所有ディレクトリ内にある除外名（state.md）は削除されない ---
+setup
+mkdir -p "$TMP/dst/scheduled-tasks/foo"
+printf 'RUNTIME-DST\n' > "$TMP/dst/scheduled-tasks/foo/state.md"
+run_deploy --yes
+assert_eq "$(cat "$TMP/dst/scheduled-tasks/foo/state.md")" "RUNTIME-DST" \
+  "配布先の所有ディレクトリ内にある除外名（state.md）は削除されずに残る"
 
 printf '\n%d passed, %d failed\n' "$PASS" "$FAIL"
 [ "$FAIL" -eq 0 ]

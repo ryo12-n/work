@@ -11,6 +11,13 @@ assert_absent_str() { if printf '%s' "$1" | grep -qF "$2"; then ng "$3"; else ok
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
+# パスだけでなく内容も見る manifest。in-place の中身書き換えを見逃さないため、
+# ハッシュ一覧（ファイル）とパス一覧（空ディレクトリの増減も拾う）の両方を比較材料にする。
+manifest() {
+  ( cd "$1" && find . -type f -exec sha256sum {} + 2>/dev/null | LC_ALL=C sort
+    cd "$1" && find . | LC_ALL=C sort )
+}
+
 setup() {
   rm -rf "$TMP/src" "$TMP/dst"
   mkdir -p "$TMP/src/rules" "$TMP/dst"
@@ -59,9 +66,9 @@ assert_contains "$out" "本番ドリフト" "配布先から消えたファイ�
 
 # --- 7. 書き込まない ---
 setup; run_deploy
-before="$(cd "$TMP/dst" && find . | LC_ALL=C sort)"
+before="$(manifest "$TMP/dst")"
 run_check >/dev/null
-after="$(cd "$TMP/dst" && find . | LC_ALL=C sort)"
+after="$(manifest "$TMP/dst")"
 [ "$before" = "$after" ] && ok "check.sh は配布先に書き込まない" || ng "check.sh は配布先に書き込まない"
 
 printf '\n%d passed, %d failed\n' "$PASS" "$FAIL"

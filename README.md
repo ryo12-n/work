@@ -3,6 +3,17 @@
 `~/.claude` に置くAIハーネス（CLAUDE.md・ルール・スケジュール済みタスク・設定）の**原本**。
 `harness/` が `~/.claude` 直下と 1:1 で対応する。
 
+> **警告: デプロイは、このブランチが `main` にマージされ、`main` を pull した後の
+> メインチェックアウトからだけ行うこと。worktree や未マージのブランチからは
+> 絶対にデプロイしない。**
+> `harness/scheduled-tasks/` と `harness/rules/` 配下のパスは全て
+> `C:\Users\nr202\projects\work\harness\`（メインチェックアウト）を指す絶対パスで
+> 書かれている。このディレクトリは今回のマージが終わるまで存在しない。
+> それより前にデプロイすると、日次タスクは静かに壊れたまま「異常なし」を報告し続ける。
+> 例えば `config-health-check` は `stat -c ... 2>/dev/null` が一致しないパスに対して
+> 空文字を返すため、差分ゲートがそれを「変化なし」と解釈して点検を一切せずに
+> 健全と報告し続ける。`harness-drift-check` は存在しない `scripts/check.sh` を呼ぼうとして失敗する。
+
 ## 使い方
 
 差分を見る（書き込まない）:
@@ -42,6 +53,15 @@ bash scripts/deploy.sh --dry-run
 
 配布も削除もしない名前: `state.md` / `実行ログ.md` / `.gitkeep`（実行時状態と枠確保用）。
 
+**`harness/skills/` `agents/` `commands/` `hooks/` は今 `.gitkeep` しか持たない空ディレクトリだが、
+削除権限を持つ所有ディレクトリとして意図的に確保してある。**
+これらは Claude Code が `~/.claude/skills|agents|commands|hooks` へ書き込む場所と一致する
+（UIでスキルやエージェント、コマンドを作るとそこに生成される）。
+このリポジトリに存在しないものは所有ディレクトリの中身とみなされ、**次の `deploy.sh` 実行で削除される。**
+今は4つとも空なので実害は無いが、UIで何か作った直後にデプロイするとそれが消える
+（`backups/harness-deploy/` から復元は可能）。**UIで作ったものを残したいときは、
+その実体を `harness/` 側にも追加してコミットすること。**
+
 ## テスト
 
 ```bash
@@ -54,3 +74,13 @@ bash scripts/test-lib.sh && bash scripts/test-deploy.sh && bash scripts/test-che
 ## 新しいマシンで立ち上げる
 
 `docs/bootstrap.md` を参照。
+
+## 畳む条件
+
+以下のどちらかを満たしたら、この仕組み全体を畳む。
+
+- `harness-drift-check` が **30日連続で異常なしを報告し、かつその間デプロイが1回も無い**
+- **複数マシンでのブートストラップ（`docs/bootstrap.md`）が 2027-02-17 までに一度も使われていない**
+
+畳むとは、`harness/` `scripts/` `docs/bootstrap.md` を削除し、`~/.claude` を元の状態
+（このリポジトリが取り込む前の、配布物ではない単体のディレクトリ）に戻すことを指す。
