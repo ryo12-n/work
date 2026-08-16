@@ -51,7 +51,13 @@ printf 'NEW\n' > "$TMP/dst/rules/新しいルール.md"
 out="$(run_check)"
 assert_contains "$out" "本番ドリフト" "配布先に増えたファイルを本番ドリフトとして検出する"
 
-# --- 6. 書き込まない ---
+# --- 6. 記録済みファイルが配布先から消えた = 本番ドリフト ---
+setup; run_deploy
+rm -f "$TMP/dst/rules/メモリ管理規約.md"
+out="$(run_check)"
+assert_contains "$out" "本番ドリフト" "配布先から消えたファイルを本番ドリフトとして検出する"
+
+# --- 7. 書き込まない ---
 setup; run_deploy
 before="$(cd "$TMP/dst" && find . | LC_ALL=C sort)"
 run_check >/dev/null

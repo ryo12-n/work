@@ -47,12 +47,16 @@ else
 fi
 
 # 未コミット
+# テスト分離のためのガード: 未コミット判定は原本が本当にこのリポジトリの harness/
+# であるときにしか意味を持たない。比較は文字列の完全一致で行う（パス正規化はしない）。
 if [ "$HARNESS_SOURCE" = "$REPO_ROOT/harness" ] && git -C "$REPO_ROOT" rev-parse --git-dir >/dev/null 2>&1; then
   DIRTY="$(git -C "$REPO_ROOT" status --porcelain -- harness || true)"
   if [ -n "$DIRTY" ]; then
     report "未コミット: harness/ に未コミットの変更があります。"
     printf '%s\n' "$DIRTY" | sed 's/^/    /'
   fi
+else
+  printf '%s\n' "（未コミット判定はスキップ: HARNESS_SOURCE がこのリポジトリの harness/ ではありません）"
 fi
 
 if [ "$ISSUES" -eq 0 ]; then
