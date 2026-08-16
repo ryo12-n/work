@@ -1,0 +1,9 @@
+{
+  "enabledPlugins": {
+    "context7@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true
+  },
+  "autoUpdatesChannel": "latest",
+  "theme": "dark",
+  "agentPushNotifEnabled": true
+}
