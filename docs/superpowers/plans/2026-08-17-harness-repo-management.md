@@ -483,7 +483,8 @@ done
 printf '\n'
 
 if [ "$DRY_RUN" -eq 1 ]; then
-  printf '--dry-run のため反映しません。\n'
+  # printf の書式文字列が `--` で始まるとオプションとして解釈され失敗する。%s 経由で渡す。
+  printf '%s\n' '--dry-run のため反映しません。'
   exit 1
 fi
 
