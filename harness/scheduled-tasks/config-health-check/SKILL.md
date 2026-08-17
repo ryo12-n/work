@@ -75,13 +75,12 @@ cd "C:/Users/nr202/iCloudDrive/iCloud~md~obsidian" && stat -c '%Y %n' "C:/Users/
 - **そのタスクの対象が実在するか。**対象0件のまま毎日走っていないか。
   これが過去に実際に起きた（memory-health-check が対象0件で空回りしていた）
 - **タスク同士が同じ検査を重複して持っていないか。**役割は 2026-08-16 に分離済み。
-  `link-integrity-check`（17:40）＝保管庫の整合性検査／このタスク＝ベストプラクティス適合と索引の修復／
-  `obsidian-daily-extraction`（17:00）＝自分の書き込み直後の競合コピー確認のみ。
+  `link-integrity-check`（17:40）＝保管庫の整合性検査／このタスク＝ベストプラクティス適合と索引の修復。
   **索引リンクだけは意図的に重複する**（修復には検出が伴うため）。
   AMBIG/GONE は17:35と17:40の両方から報告される。これは仕様
 
 **スケジューラに登録されていないディレクトリは対象外。**`scheduled-tasks/` には削除済みタスクの
-SKILL.md が残ることがある（`memory-health-check` は 2026-08-16 に削除、ファイルは復元用に残置）。
+SKILL.md が残ることがある（`obsidian-daily-extraction` は 2026-08-17 に廃止、ディレクトリは残置）。
 点検前に `list_scheduled_tasks` で登録済みの taskId を取り、それ以外は無視する。
 
 ### `C:\Users\nr202\projects\work\harness\rules\*.md`
