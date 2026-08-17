@@ -79,15 +79,14 @@ cd "C:/Users/nr202/iCloudDrive/iCloud~md~obsidian" && stat -c '%Y %n' "C:/Users/
   **索引リンクだけは意図的に重複する**（修復には検出が伴うため）。
   AMBIG/GONE は17:35と17:40の両方から報告される。これは仕様
 
-**スケジューラに登録されていないディレクトリは対象外。**`scheduled-tasks/` には削除済みタスクの
-SKILL.md が残ることがある（`obsidian-daily-extraction` は 2026-08-17 に廃止、ディレクトリは残置）。
-点検前に `list_scheduled_tasks` で登録済みの taskId を取り、それ以外は無視する。
+**点検前に `list_scheduled_tasks` を引き、`scheduled-tasks/` のディレクトリと1対1か確認する。**
+ディレクトリがあるのに未登録なら報告する（索引が「登録済み」と書いていても実際には走っていない）。
+登録が無いディレクトリは点検対象から外す。
 
 ### `C:\Users\nr202\projects\work\harness\rules\*.md`
 - 保管庫のルール（索引の「保管庫を触るとき」が指すファイル群）と二重管理になっていないか。
   同じ規約が両方にあれば指摘する
 - そのルールが適用される対象が実在するか
-  ※ `memory.md` は現在 `~/.claude/projects/*/memory/` が空で、適用対象がない状態。削除候補（本人判断待ち）
 
 ### ユーザースコープの `CLAUDE.md`
 - **200行以内か。**`@` import があれば展開後の実効行数で数えること（import 先の行数を足す）
