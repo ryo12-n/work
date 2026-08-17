@@ -25,14 +25,23 @@ broken=0; fixed=0; ambiguous=0; missing=0; failed=0
 while IFS= read -r p; do
   [ -z "$p" ] && continue
   case "$p" in http*|\#*|/*) continue ;; esac
-  [ -e "$p" ] && continue
+  # 記法の例示（本文中の `](パス)` など）を実リンクと誤認しない。
+  # 索引のリンク先は全て .md。非 .md を索引へ書いたときは linkcheck.sh 側が拾う。
+  case "$p" in *.md) ;; *) continue ;; esac
+  # Markdown リンクの %20 は実ファイル名の空白（linkcheck.sh と同じ扱い）。
+  # デコードせずに照合すると、実在するファイルを GONE と誤報する。
+  # 置換キーは索引の表記そのままである必要があるため $p は書き換えない。
+  decoded=$(printf '%s' "$p" | sed 's/%20/ /g')
+  [ -e "$decoded" ] && continue
   broken=$((broken+1))
 
-  base=$(basename "$p")
+  base=$(basename "$decoded")
   mapfile -t hits < <(find . -name "$base" -not -path "./.Trash/*" -not -path "./.obsidian/*" | sed 's|^\./||')
 
   if [ "${#hits[@]}" -eq 1 ]; then
-    new="${hits[0]}"
+    # 索引へ書き戻す表記は空白を %20 へ再エンコードする。生の空白のまま書くと
+    # Obsidian/CommonMark 上は未解決なのに、-e 判定では健全に見えるリンクができる。
+    new=$(printf '%s' "${hits[0]}" | sed 's/ /%20/g')
     # BRE のメタ文字と sed の区切り(|)・置換特殊文字(&)をすべてエスケープする。
     # ここを漏らすと「FIX と報告したのに置換は空振り」という最悪の故障になる。
     esc_old=$(printf '%s' "$p"   | sed 's/[][\.*^$&|\\]/\\&/g')
