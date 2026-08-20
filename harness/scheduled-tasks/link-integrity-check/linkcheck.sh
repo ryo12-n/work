@@ -101,12 +101,12 @@ while IFS= read -r f; do
 done < "$TMP/files.txt" | sort -u > "$TMP/paths.txt"
 if [ -s "$TMP/paths.txt" ]; then cat "$TMP/paths.txt"; else echo "  OK"; fi
 
-echo "### 4. 索引（MEMORY.md）のリンク"
-INDEX="personal/AIメモリ/MEMORY.md"   # 索引は1本だけ。探索しない
+echo "### 4. 索引（保管庫索引.md）のリンク"
+# 索引の正本は保管庫の外（2026-08-18〜）。保管庫内を探しても見つかるのはポインタだけなので
+# 候補は出さない。リンク先は保管庫ルート相対のまま解決する。
+INDEX="/c/Users/nr202/.claude/rules/保管庫索引.md"
 if [ ! -f "$INDEX" ]; then
   echo "  BROKEN  索引が見つかりません: $INDEX"
-  hit=$(find . -name "MEMORY.md" -not -path "./.Trash/*" -not -path "./.obsidian/*" | sed 's|^\./|          候補: |')
-  [ -n "$hit" ] && echo "$hit"
 else
   echo "  索引: ${INDEX#./}"
   n=0

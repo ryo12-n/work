@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
-# MEMORY.md（索引）のリンク切れを、ベース名で一意に解決できるものだけ自動修復する。
+# 保管庫索引のリンク切れを、ベース名で一意に解決できるものだけ自動修復する。
 # 曖昧なもの・見つからないものは報告のみ。
 # 使い方: bash fix-index.sh [--apply]   (--apply なしは dry-run)
 
 VAULT="/c/Users/nr202/iCloudDrive/iCloud~md~obsidian"
-INDEX="personal/AIメモリ/MEMORY.md"   # 索引は1本だけ。探索しない（別の MEMORY.md を書き換えないため）
+# 索引の正本は保管庫の外（iCloud 衝突で名前が変わるのを避けるため・2026-08-18）。
+# リンク先は保管庫ルート相対のままなので $VAULT への cd は残す。探索はしない。
+INDEX="/c/Users/nr202/.claude/rules/保管庫索引.md"
 
 cd "$VAULT" || { echo "FATAL: 保管庫が見つかりません: $VAULT"; exit 1; }
 [ -f "$INDEX" ] || { echo "FATAL: 索引が見つかりません: $INDEX"; exit 1; }
