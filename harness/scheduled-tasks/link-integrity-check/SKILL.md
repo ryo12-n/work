@@ -26,8 +26,11 @@ bash "C:/Users/nr202/.claude/scheduled-tasks/link-integrity-check/linkcheck.sh"
 - **1. `CLAUDE.md` の `@import`** — 実パスの存在確認。壊れていればベース名で候補を探して併記する
 - **2. `[[wikilink]]`** — 保管庫内の `.md` ベース名に解決できるか
 - **3. 本文中のパス参照** — バッククォート内のパス。保管庫内の実在パスに末尾一致すれば解決とみなす
-- **4. 索引（`MEMORY.md`）のリンク** — 全リンク先の実在確認。壊れていれば候補を併記する
-- **5. iCloud の競合コピー** — `* 2.md` `* 3.md` の検出
+- **4. 索引（`~/.claude/rules/保管庫索引.md`）のリンク** — 全リンク先の実在確認。壊れていれば候補を併記する
+- **5. iCloud の競合コピー** — `* 2.md` `* 3.md` の検出。
+  **解決は `config-health-check`（17:35）の `fix-conflicts.sh` が持つ。**
+  ここに出るのは「17:35 で判定できず REPORT になったもの」「17:35 以降に発生したもの」
+  「iCloud が削除を止めて残ったもの」のいずれか。**このタスクは直さない**
 - **6. 被リンクゼロ** — `20_knowledge/` のうち、どこからも `[[...]]` されていないノート
 
 **このタスクが保管庫の整合性チェックの唯一の持ち主。**`config-health-check`（17:35）は
@@ -44,7 +47,8 @@ bash "C:/Users/nr202/.claude/scheduled-tasks/link-integrity-check/linkcheck.sh"
 ## 既知の未修正（毎回出るが報告不要）
 
 現在なし。**`CLAUDE.md` の `@import` 4本は 2026-08-16 に解消済み**
-（`@import` を全廃し、`personal/AIメモリ/MEMORY.md` の索引方式へ移行した）。
+（`@import` を全廃し、索引方式へ移行した。索引の正本は
+`C:\Users\nr202\.claude\rules\保管庫索引.md` で保管庫の外にある）。
 
 ここに項目を足すのは、本人が「直さない」と明示的に判断したものだけにする。
 **溜めると検査そのものが空洞化する。**

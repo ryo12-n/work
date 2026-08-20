@@ -6,5 +6,12 @@
   },
   "autoUpdatesChannel": "latest",
   "theme": "dark",
-  "agentPushNotifEnabled": true
+  "agentPushNotifEnabled": true,
+  "permissions": {
+    "allow": [
+      "Bash(cd \"C:/Users/nr202/projects/work\" && git push*)",
+      "Bash(cd \"C:/Users/nr202/projects/work\" && gh pr create*)",
+      "Bash(cd \"C:/Users/nr202/projects/work\" && gh pr merge*)"
+    ]
+  }
 }
