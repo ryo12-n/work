@@ -22,8 +22,13 @@ Claude Code の設定・スケジュール済みタスク・ルールファイ�
 対象ファイルの現在の mtime を取る。
 
 ```bash
-cd "C:/Users/nr202/iCloudDrive/iCloud~md~obsidian" && stat -c '%Y %n' "C:/Users/nr202/projects/work/harness/settings.json" "C:/Users/nr202/projects/work/harness/rules/"*.md "C:/Users/nr202/projects/work/harness/scheduled-tasks/"*/SKILL.md "C:/Users/nr202/projects/work/harness/CLAUDE.md" "C:/Users/nr202/.claude/rules/保管庫索引.md" $(grep -oP '\]\(\K[^)]+' "C:/Users/nr202/.claude/rules/保管庫索引.md") 2>/dev/null
+cd "C:/Users/nr202/iCloudDrive/iCloud~md~obsidian" && stat -c '%Y %n' "C:/Users/nr202/projects/work/harness/settings.json" "C:/Users/nr202/projects/work/harness/rules/"*.md "C:/Users/nr202/projects/work/harness/scheduled-tasks/"*/SKILL.md "C:/Users/nr202/projects/work/harness/CLAUDE.md" "C:/Users/nr202/.claude/rules/保管庫索引.md" $(grep -oP '\]\(\K[^)]+\.md(?=\))' "C:/Users/nr202/.claude/rules/保管庫索引.md") 2>/dev/null
 ```
+
+`\.md(?=\))` で締める。これが無いと、索引の解説文にある `](...)` という表記そのものを拾い、
+実在しない `...` と `パス` を stat に渡してエラーを出す（2026-08-21 に修正）。
+**代わりに、索引が `.md` 以外へマークダウンリンクを張ると mtime 走査から無言で外れる。**
+`.md` 以外のリンクを索引へ足すときは、ここのパターンも一緒に広げる。
 
 **索引の正本は保管庫の外**（`C:\Users\nr202\.claude\rules\保管庫索引.md`・2026-08-18〜）。
 保管庫側の `personal\AIメモリ\MEMORY.md` は移転先を指すポインタなので、**そこから対象を取らない。**
@@ -172,10 +177,17 @@ bash "C:/Users/nr202/.claude/scheduled-tasks/config-health-check/fix-index.sh" -
 `fix-index.sh` も `linkcheck.sh` も検査しない。**ここだけは毎回、目視で実在を確認する。**
 
 ```bash
-grep -oP 'C:\\[^`]+' "C:/Users/nr202/.claude/rules/保管庫索引.md" | while IFS= read -r p; do [ -e "${p//\\//}" ] || echo "索引『保管庫の外』に実体なし: $p"; done
+grep -oP 'C:[^`" ]+' "C:/Users/nr202/.claude/rules/保管庫索引.md" | sort -u | while IFS= read -r p; do [ -e "$p" ] || echo "索引『保管庫の外』に実体なし: $p"; done
 ```
 
-（`read -r` と `${p//\\//}` が要る。バックスラッシュ区切りのまま `[ -e ]` に渡すと必ず失敗する）
+**パターンにバックスラッシュを書かない。**Bash ツール経由でコマンドを渡すと `\\` が `\` へ潰れ、
+`C:\\` のつもりが PCRE の `C:\[` になって**1件も一致しない**。
+以前の版はこれで毎回0件を走査していた（2026-08-21 に実測して確認）。
+`[^`" ]+` で切ると、引用符やコマンド引数を巻き込まずにパスだけが取れる。
+
+**バックスラッシュ区切りのパスは Git Bash の `[ -e ]` がそのまま解決する。**
+`${p//\\//}` での置換を挟まない。この環境では置換が `\` ではなく `/` を消すため、
+実在するパスまで「実体なし」と報告する。
 
 ## 7. コミット・PR作成・マージ
 
