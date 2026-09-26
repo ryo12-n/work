@@ -29,7 +29,7 @@ strip_code() {
 # プレースホルダ判定：山括弧を含む、または以下の汎用語そのもの
 is_placeholder() {
   case "$1" in
-    *"<"*|*">"*|人名|ファイル名|名前|タイトル|日付|name|title|path|パス) return 0 ;;
+    *"<"*|*">"*|...|人名|ファイル名|名前|タイトル|日付|name|title|path|パス) return 0 ;;
   esac
   return 1
 }
