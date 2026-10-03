@@ -13,9 +13,10 @@ description: メモリ管理規約への違反を毎日点検し、サブエー�
 
 ## 手順
 
-1. **基準を読む。この2本が正。**
+1. **基準を読む。この3本が正。**
 
-   - `C:\Users\nr202\projects\work\harness\rules\メモリ管理規約.md` — 本文1〜11条。**何が正しいか**
+   - `C:\Users\nr202\projects\work\harness\rules\メモリ管理規約.md` — 本文1〜10条。**何が正しいか**
+   - `C:\Users\nr202\projects\work\harness\rules\保管庫管理規約.md` — 本文1〜3条。**どこに何を置き、どう書き込むか**
    - `C:\Users\nr202\projects\work\harness\scheduled-tasks\memory-health-check\reference\点検項目.md` —
      0〜7節。**何を検査し、どこまで自律で直すか**
 
